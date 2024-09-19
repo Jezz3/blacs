@@ -58,22 +58,18 @@ class Plugin(QObject):
     def on_shot_complete(self, h5_filepath):
         #Open the HDF5 file in read mode
         with h5py.File(h5_filepath, 'r') as hdf:
-            # Navigate to the specific path in the file            
-            path = '/globals/loop/expansion'
-            
-            # Check if the path exists
-            if path in hdf:
+            # Navigate to the specific path in the file
+            globals_group = hdf["/globals"]
+            all_group = {name for name,_ in globals_group.items()}  
+            matching_attributes = {}
+            for group in all_group:
+                path = f'/globals/{group}/expansion'
                 dataset = hdf[path]
-                
                 # Iterate through the attributes and find those with the value "outer"
-                matching_attributes = {attr: value for attr, value in dataset.attrs.items() if value == 'outer'}
-
+                matching_attributes.update({attr: value for attr, value in dataset.attrs.items() if value == 'outer'})
                 print(f"matching_attributes: {matching_attributes}")
-            else:
-                print(f"Path {path} not found in the HDF5 file.")
-
-            globals_group = hdf['/globals']
-            output_text = ""
+                globals_group = hdf['/globals']
+                output_text = ""
 
             for attr in matching_attributes:
                 if attr in globals_group.attrs:
