@@ -62,20 +62,24 @@ class Plugin(QObject):
             globals_group = hdf["/globals"]
             all_group = {name for name,_ in globals_group.items()}  
             matching_attributes = {}
+            unit_values = {}
             for group in all_group:
-                path = f'/globals/{group}/expansion'
-                dataset = hdf[path]
                 # Iterate through the attributes and find those with the value "outer"
-                matching_attributes.update({attr: value for attr, value in dataset.attrs.items() if value == 'outer'})
-                print(f"matching_attributes: {matching_attributes}")
-                globals_group = hdf['/globals']
-                output_text = ""
+                path_expansion = f'/globals/{group}/expansion'
+                matching_attributes.update({attr: value for attr, value in hdf[path_expansion].attrs.items() if value == 'outer'})
+                # Get the units of the attributes
+                path_units = f'/globals/{group}/units'
+                unit_values.update({attr: unit for attr, unit in hdf[path_units].attrs.items()})	
+
+            globals_group = hdf['/globals']
+            output_text = ""
 
             for attr in matching_attributes:
                 if attr in globals_group.attrs:
                     value = globals_group.attrs[attr]
                     axes = matching_attributes[attr]
-                    output_text += f"'{attr}' : {value}, {axes}\n"
+                    unit = unit_values[attr]
+                    output_text += f"'{attr}':{value}{unit}, axes: {axes}\n"
                 else:
                     output_text += f"Attribute '{attr}' not found in /globals\n"
 
