@@ -79,7 +79,7 @@ class Plugin(QObject):
                     value = globals_group.attrs[attr]
                     axes = matching_attributes[attr]
                     unit = unit_values[attr]
-                    output_text += f"'{attr}':{value}{unit}, axes: {axes}\n"
+                    output_text += f"'{attr}':{value} {unit}, axes: {axes}\n"
                 else:
                     output_text += f"Attribute '{attr}' not found in /globals\n"
 
